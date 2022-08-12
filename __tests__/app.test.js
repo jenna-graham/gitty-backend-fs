@@ -3,6 +3,8 @@ const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
 
+const agent = request.agent(app);
+
 jest.mock('../lib/services/github');
 
 describe('auth routes', () => {
@@ -23,6 +25,21 @@ describe('auth routes', () => {
       iat: expect.any(Number),
       exp: expect.any(Number),
     });
+  });
+
+  it('GET /api/v1/posts lists all posts for authenticated user', async () => {
+    await agent.get('/api/v1/github/callback?code=42');
+    const res = await agent.get('/api/v1/posts');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(
+      expect.arrayContaining([
+        {
+          id: expect.any(String),
+          title: expect.any(String),
+          post: expect.any(String),
+        },
+      ])
+    );
   });
 
   afterAll(() => {
