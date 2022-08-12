@@ -42,6 +42,20 @@ describe('auth routes', () => {
     );
   });
 
+  it('/POST /api/v1/posts should create new post', async () => {
+    const newPost = {
+      title: 'HI!',
+      post: 'IM NOT YELLING AT YOU, I AM NEW TO SQL',
+    };
+    await agent.get('/api/v1/github/callback?code=42');
+    const res = await agent.post('/api/v1/posts').send(newPost);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      id: expect.any(String),
+      ...newPost,
+    });
+  });
+
   afterAll(() => {
     pool.end();
   });
